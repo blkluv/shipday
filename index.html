@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipday ROI Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --green-900: #0f3d2b;
+            --green-800: #1a5c3f;
+            --green-700: #1e7a4e;
+            --green-600: #2a9d5c;
+            --green-500: #3cb371;
+            --green-400: #50C386;
+            --green-300: #6AE4A3;
+            --green-200: #a8f0cb;
+            --green-100: #d4f8e5;
+            --green-50: #edfcf3;
+            --red-500: #ef4444;
+            --red-100: #fee2e2;
+            --amber-500: #f59e0b;
+            --amber-100: #fef3c7;
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --slate-700: #334155;
+            --slate-600: #475569;
+            --slate-500: #64748b;
+            --slate-400: #94a3b8;
+            --slate-300: #cbd5e1;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --slate-50: #f8fafc;
+            --gold: #d4a853;
+            --purple-600: #7c3aed;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: var(--slate-100);
+            color: var(--slate-800);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* ---- HEADER ---- */
+        .header {
+            background: linear-gradient(145deg, var(--green-900) 0%, var(--green-800) 40%, var(--green-700) 100%);
+            padding: 48px 40px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -60%;
+            right: -20%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(106,228,163,0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .header-badge {
+            display: inline-block;
+            background: rgba(106,228,163,0.15);
+            border: 1px solid rgba(106,228,163,0.3);
+            color: var(--green-200);
+            font-size: 0.78em;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 6px 16px;
+            border-radius: 100px;
+            margin-bottom: 16px;
+        }
+        .header h1 {
+            font-family: 'Fraunces', serif;
+            font-size: 2.4em;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+        .header p {
+            color: var(--green-200);
+            font-size: 1.1em;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ---- PAIN POINT BANNER ---- */
+        .pain-banner {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 32px 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
+            border-bottom: 3px solid var(--red-500);
+        }
+        .pain-stat {
+            text-align: center;
+            padding: 16px;
+        }
+        .pain-stat .number {
+            font-family: 'Fraunces', serif;
+            font-size: 2.2em;
+            font-weight: 800;
+            color: var(--red-500);
+            line-height: 1;
+        }
+        .pain-stat .desc {
+            color: var(--slate-300);
+            font-size: 0.88em;
+            margin-top: 6px;
+        }
+
+        /* ---- HERO RESULTS ---- */
+        .hero-results {
+            background: linear-gradient(135deg, var(--green-50) 0%, #fff 100%);
+            border: 2px solid var(--green-200);
+            margin: 32px 0;
+            border-radius: 16px;
+            padding: 36px;
+            position: relative;
+        }
+        .hero-results::after {
+            content: 'LIVE RESULTS';
+            position: absolute;
+            top: -12px;
+            left: 32px;
+            background: var(--green-600);
+            color: #fff;
+            font-size: 0.7em;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            padding: 4px 14px;
+            border-radius: 100px;
+        }
+        .hero-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .hero-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px 16px;
+            text-align: center;
+            border: 1px solid var(--green-200);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .hero-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(80,195,134,0.15); }
+        .hero-card .label {
+            font-size: 0.75em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--slate-500);
+            margin-bottom: 4px;
+        }
+        .hero-card .value {
+            font-family: 'Fraunces', serif;
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--green-700);
+            line-height: 1.1;
+        }
+        .hero-card .sub { font-size: 0.8em; color: var(--slate-500); margin-top: 2px; }
+        .hero-card.highlight {
+            background: linear-gradient(135deg, var(--green-700) 0%, var(--green-600) 100%);
+            border-color: var(--green-600);
+        }
+        .hero-card.highlight .label { color: var(--green-200); }
+        .hero-card.highlight .value { color: #fff; }
+        .hero-card.highlight .sub { color: var(--green-200); }
+        .hero-summary {
+            text-align: center;
+            font-size: 1.05em;
+            color: var(--slate-700);
+            padding-top: 16px;
+            border-top: 1px solid var(--green-200);
+        }
+        .hero-summary strong { color: var(--green-700); }
+
+        /* ---- TABS ---- */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--slate-200);
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 28px;
+        }
+        .tab {
+            flex: 1;
+            padding: 12px 16px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: transparent;
+            color: var(--slate-600);
+        }
+        .tab.active {
+            background: #fff;
+            color: var(--green-800);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* ---- SECTIONS ---- */
+        .section {
+            background: #fff;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            border: 1px solid var(--slate-200);
+        }
+        .section-header {
+            font-family: 'Fraunces', serif;
+            font-size: 1.35em;
+            font-weight: 700;
+            color: var(--green-900);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--green-100);
+        }
+
+        /* ---- INPUTS ---- */
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+        }
+        .input-group { display: flex; flex-direction: column; }
+        .input-group label {
+            font-weight: 600;
+            font-size: 0.85em;
+            color: var(--slate-700);
+            margin-bottom: 6px;
+        }
+        .input-group input,
+        .input-group select {
+            padding: 11px 14px;
+            border: 2px solid var(--slate-200);
+            border-radius: 10px;
+            font-size: 0.95em;
+            font-family: inherit;
+            transition: border-color 0.2s;
+            background: var(--slate-50);
+        }
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: var(--green-400);
+            background: #fff;
+        }
+        .input-hint {
+            font-size: 0.75em;
+            color: var(--slate-400);
+            margin-top: 3px;
+        }
+
+        /* ---- COMPARISON TABLE ---- */
+        .comp-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .comp-table th {
+            background: var(--green-900);
+            color: #fff;
+            padding: 14px 16px;
+            font-size: 0.82em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            text-align: center;
+        }
+        .comp-table td {
+            padding: 13px 16px;
+            text-align: center;
+            border-bottom: 1px solid var(--slate-100);
+            font-size: 0.92em;
+        }
+        .comp-table tr:last-child td { border-bottom: none; }
+        .comp-table .row-loss { background: var(--red-100); }
+        .comp-table .row-loss td { color: var(--slate-800); }
+        .comp-table .row-win {
+            background: linear-gradient(90deg, var(--green-50) 0%, var(--green-100) 100%);
+        }
+        .comp-table .row-win td { font-weight: 600; color: var(--green-800); }
+        .cost-bad { color: var(--red-500); font-weight: 700; }
+        .cost-good { color: var(--green-600); font-weight: 700; }
+
+        /* ---- AI RECEPTIONIST SECTION ---- */
+        .ai-section {
+            background: linear-gradient(145deg, #0f0f23 0%, #1a1a3e 50%, #0f3d2b 100%);
+            border-radius: 16px;
+            padding: 40px 36px;
+            margin-bottom: 24px;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+        .ai-section::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -15%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(106,228,163,0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .ai-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--gold) 0%, #e8c36a 100%);
+            color: var(--slate-900);
+            font-size: 0.72em;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 5px 14px;
+            border-radius: 100px;
+            margin-bottom: 16px;
+        }
+        .ai-section h2 {
+            font-family: 'Fraunces', serif;
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+        .ai-section .subtitle {
+            color: var(--green-300);
+            font-size: 1.05em;
+            margin-bottom: 28px;
+        }
+        .ai-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .ai-metric-card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .ai-metric-card .val {
+            font-family: 'Fraunces', serif;
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--green-300);
+            line-height: 1.1;
+        }
+        .ai-metric-card .lbl {
+            font-size: 0.8em;
+            color: var(--slate-300);
+            margin-top: 4px;
+        }
+        .ai-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .ai-inputs label {
+            font-size: 0.82em;
+            font-weight: 600;
+            color: var(--green-200);
+            display: block;
+            margin-bottom: 5px;
+        }
+        .ai-inputs input,
+        .ai-inputs select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.92em;
+        }
+        .ai-inputs input:focus,
+        .ai-inputs select:focus {
+            outline: none;
+            border-color: var(--green-400);
+            background: rgba(255,255,255,0.12);
+        }
+        .ai-inputs select option { color: var(--slate-900); background: #fff; }
+        .ai-compare-box {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 16px;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .ai-compare-item {
+            text-align: center;
+            padding: 20px;
+            border-radius: 12px;
+        }
+        .ai-compare-item.standalone {
+            background: rgba(239,68,68,0.12);
+            border: 1px solid rgba(239,68,68,0.25);
+        }
+        .ai-compare-item.bundled {
+            background: rgba(106,228,163,0.12);
+            border: 1px solid rgba(106,228,163,0.3);
+        }
+        .ai-compare-item .price {
+            font-family: 'Fraunces', serif;
+            font-size: 1.6em;
+            font-weight: 700;
+        }
+        .ai-compare-item.standalone .price { color: var(--red-500); }
+        .ai-compare-item.bundled .price { color: var(--green-300); }
+        .ai-compare-item .detail { font-size: 0.82em; color: var(--slate-400); margin-top: 4px; }
+        .ai-compare-vs {
+            font-family: 'Fraunces', serif;
+            font-size: 1.1em;
+            font-weight: 700;
+            color: var(--slate-400);
+        }
+
+        /* ---- PLAN COMPARISON ---- */
+        .plan-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .plan-card {
+            border-radius: 14px;
+            padding: 28px 24px;
+            border: 2px solid var(--slate-200);
+            position: relative;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+        .plan-card:hover { transform: translateY(-3px); }
+        .plan-card.recommended {
+            border-color: var(--green-400);
+            background: linear-gradient(180deg, var(--green-50) 0%, #fff 40%);
+            box-shadow: 0 8px 32px rgba(80,195,134,0.18);
+        }
+        .plan-card.recommended::before {
+            content: 'BEST VALUE FOR GROWTH';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--green-600) 0%, var(--green-500) 100%);
+            color: #fff;
+            font-size: 0.68em;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            padding: 4px 16px;
+            border-radius: 100px;
+            white-space: nowrap;
+        }
+        .plan-name {
+            font-family: 'Fraunces', serif;
+            font-size: 1.15em;
+            font-weight: 700;
+            color: var(--green-900);
+            margin-bottom: 4px;
+        }
+        .plan-price {
+            font-family: 'Fraunces', serif;
+            font-size: 2em;
+            font-weight: 800;
+            color: var(--green-700);
+        }
+        .plan-price span { font-size: 0.45em; font-weight: 500; color: var(--slate-500); }
+        .plan-daily {
+            font-size: 0.82em;
+            color: var(--slate-500);
+            margin-bottom: 16px;
+        }
+        .plan-features {
+            list-style: none;
+            padding: 0;
+        }
+        .plan-features li {
+            padding: 6px 0;
+            font-size: 0.85em;
+            color: var(--slate-700);
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .plan-features .check { color: var(--green-500); font-weight: 700; flex-shrink: 0; }
+        .plan-features .x { color: var(--slate-300); flex-shrink: 0; }
+        .plan-features .gold-check { color: var(--gold); font-weight: 700; flex-shrink: 0; }
+        .plan-roi {
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid var(--slate-200);
+            text-align: center;
+        }
+        .plan-roi .roi-val {
+            font-family: 'Fraunces', serif;
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--green-600);
+        }
+        .plan-roi .roi-label { font-size: 0.78em; color: var(--slate-500); }
+
+        /* ---- BREAKEVEN ---- */
+        .breakeven {
+            background: var(--amber-100);
+            border: 2px solid var(--amber-500);
+            border-radius: 14px;
+            padding: 24px 28px;
+            text-align: center;
+            margin: 24px 0;
+        }
+        .breakeven h3 { color: #92400e; font-size: 1.15em; margin-bottom: 8px; }
+        .breakeven .big { font-family: 'Fraunces', serif; font-size: 1.8em; font-weight: 700; color: #92400e; }
+        .breakeven .detail { color: #78350f; font-size: 0.9em; margin-top: 4px; }
+        .progress-track {
+            background: rgba(146,64,14,0.15);
+            border-radius: 10px;
+            height: 14px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--amber-500), var(--green-500));
+            border-radius: 10px;
+            transition: width 0.6s ease;
+        }
+
+        /* ---- TIMELINE ---- */
+        .timeline-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin: 20px 0;
+        }
+        .timeline-card {
+            background: var(--slate-50);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--slate-200);
+        }
+        .timeline-card .period {
+            font-weight: 700;
+            font-size: 0.88em;
+            color: var(--green-800);
+            margin-bottom: 4px;
+        }
+        .timeline-card .desc { font-size: 0.78em; color: var(--slate-500); margin-bottom: 8px; }
+        .timeline-card .amount {
+            font-family: 'Fraunces', serif;
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--green-600);
+        }
+
+        /* ---- CTA ---- */
+        .cta-section {
+            background: linear-gradient(145deg, var(--green-900), var(--green-800));
+            border-radius: 16px;
+            padding: 44px 40px;
+            text-align: center;
+            color: #fff;
+            margin-top: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            bottom: -40%;
+            left: -10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(106,228,163,0.1) 0%, transparent 60%);
+        }
+        .cta-section h2 {
+            font-family: 'Fraunces', serif;
+            font-size: 1.8em;
+            margin-bottom: 12px;
+        }
+        .cta-section h2 .green { color: var(--green-300); }
+        .cta-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin: 28px 0;
+        }
+        .cta-stat {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            padding: 16px;
+        }
+        .cta-stat .val { font-family: 'Fraunces', serif; font-size: 1.3em; font-weight: 700; }
+        .cta-stat .lbl { font-size: 0.78em; color: var(--green-200); margin-top: 2px; }
+        .cta-bottom {
+            font-size: 1.05em;
+            color: var(--green-200);
+            margin-top: 16px;
+        }
+
+        /* ---- REVIEW SECTION ---- */
+        .review-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .review-card {
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+        }
+        .review-card.savings {
+            background: linear-gradient(135deg, #fef2f2, #fff);
+            border: 1px solid #fecaca;
+        }
+        .review-card.growth {
+            background: linear-gradient(135deg, var(--green-50), #fff);
+            border: 1px solid var(--green-200);
+        }
+        .review-card h4 { font-size: 0.9em; margin-bottom: 8px; }
+        .review-card .big-val {
+            font-family: 'Fraunces', serif;
+            font-size: 2em;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+        .review-card .info { font-size: 0.82em; color: var(--slate-500); margin-top: 6px; }
+
+        /* ---- RESPONSIVE ---- */
+        @media (max-width: 768px) {
+            .header { padding: 32px 24px; }
+            .header h1 { font-size: 1.8em; }
+            .pain-banner { grid-template-columns: 1fr 1fr; padding: 24px; }
+            .hero-grid { grid-template-columns: repeat(2, 1fr); }
+            .plan-grid { grid-template-columns: 1fr; }
+            .plan-card.recommended { order: -1; }
+            .ai-compare-box { grid-template-columns: 1fr; }
+            .ai-compare-vs { display: none; }
+            .review-grid { grid-template-columns: 1fr; }
+            .timeline-grid { grid-template-columns: 1fr; }
+            .section { padding: 24px 20px; }
+            .ai-section { padding: 28px 24px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- HEADER -->
+    <div style="background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.06); margin-bottom: 0;">
+        <div class="header">
+            <div class="header-badge">ROI Calculator</div>
+            <h1>How Much Is Your Restaurant Leaving on the Table?</h1>
+            <p>See your personalized savings, revenue recovery, and growth potential with Shipday</p>
+        </div>
+
+        <!-- PAIN POINTS -->
+        <div class="pain-banner">
+            <div class="pain-stat">
+                <div class="number">43%</div>
+                <div class="desc">of restaurant calls go unanswered during peak hours</div>
+            </div>
+            <div class="pain-stat">
+                <div class="number">30%</div>
+                <div class="desc">lost to third-party commissions on every delivery order</div>
+            </div>
+            <div class="pain-stat">
+                <div class="number">$1,200+</div>
+                <div class="desc">in missed phone revenue each month for a typical restaurant</div>
+            </div>
+            <div class="pain-stat">
+                <div class="number">100+ hrs</div>
+                <div class="desc">of staff time wasted answering routine calls monthly</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HERO RESULTS -->
+    <div class="hero-results">
+        <div class="hero-grid">
+            <div class="hero-card">
+                <div class="label">Delivery Savings</div>
+                <div class="value" id="heroDeliverySavings">$150</div>
+                <div class="sub">per month</div>
+            </div>
+            <div class="hero-card">
+                <div class="label">Revenue Growth</div>
+                <div class="value" id="heroRevenueGrowth">$529</div>
+                <div class="sub">per month</div>
+            </div>
+            <div class="hero-card">
+                <div class="label">AI Revenue Recovery</div>
+                <div class="value" id="heroAIRecovery">$2,188</div>
+                <div class="sub">per month</div>
+            </div>
+            <div class="hero-card highlight">
+                <div class="label">Total Monthly Benefit</div>
+                <div class="value" id="heroTotal">$2,867</div>
+                <div class="sub">with Business Advanced Unlimited</div>
+            </div>
+        </div>
+        <div class="hero-summary">
+            With the <strong>Business Advanced Unlimited</strong> plan, your total annual impact is <strong id="heroAnnual">$34,404</strong> for just <strong>$11.63/day</strong>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+        <button class="tab active" data-tab="inputs">Your Restaurant</button>
+        <button class="tab" data-tab="delivery">Delivery ROI</button>
+        <button class="tab" data-tab="ai">AI Receptionist</button>
+        <button class="tab" data-tab="plans">Plan Comparison</button>
+    </div>
+
+    <!-- TAB: INPUTS -->
+    <div class="tab-panel active" id="panel-inputs">
+        <div class="section">
+            <div class="section-header">Your Restaurant Information</div>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="orderValue">Average Order Value ($)</label>
+                    <input type="number" id="orderValue" value="35" min="10" step="1">
+                </div>
+                <div class="input-group">
+                    <label for="monthlyDeliveries">Monthly Third-Party Deliveries</label>
+                    <input type="number" id="monthlyDeliveries" value="400" min="0">
+                    <div class="input-hint">Orders through DoorDash, Uber Eats, Grubhub, etc.</div>
+                </div>
+                <div class="input-group">
+                    <label for="monthlyInHouseDeliveries">Monthly Direct Deliveries (Toast)</label>
+                    <input type="number" id="monthlyInHouseDeliveries" value="150" min="0">
+                    <div class="input-hint">Currently dispatched through Toast Delivery Services</div>
+                </div>
+                <div class="input-group">
+                    <label for="monthlyTakeout">Monthly Takeout Orders</label>
+                    <input type="number" id="monthlyTakeout" value="500" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="commissionRate">Current 3PD Commission Rate</label>
+                    <select id="commissionRate">
+                        <option value="0.15">15%</option>
+                        <option value="0.20">20%</option>
+                        <option value="0.25">25%</option>
+                        <option value="0.30" selected>30%</option>
+                        <option value="0.35">35%</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="menuMarkup">3PD Menu Markup</label>
+                    <select id="menuMarkup">
+                        <option value="0">0% (No markup)</option>
+                        <option value="0.10">10%</option>
+                        <option value="0.15" selected>15%</option>
+                        <option value="0.20">20%</option>
+                        <option value="0.25">25%</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="toastDeliveryService">Current Toast Delivery Service</label>
+                    <select id="toastDeliveryService">
+                        <option value="none">Not using Toast Delivery</option>
+                        <option value="doordash" selected>DoorDash ($7.49/delivery)</option>
+                        <option value="uber">Uber Eats ($6.99/delivery)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="currentRating">Current Google Rating</label>
+                    <input type="number" id="currentRating" value="4.2" min="1" max="5" step="0.1">
+                </div>
+                <div class="input-group">
+                    <label for="totalGoogleReviews">Total Google Reviews</label>
+                    <input type="number" id="totalGoogleReviews" value="85" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="targetRating">Target Google Rating</label>
+                    <select id="targetRating">
+                        <option value="4.3">4.3</option>
+                        <option value="4.4">4.4</option>
+                        <option value="4.5" selected>4.5</option>
+                        <option value="4.6">4.6</option>
+                        <option value="4.7">4.7</option>
+                        <option value="4.8">4.8</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="conversionRate">3PD-to-Direct Conversion Rate</label>
+                    <select id="conversionRate">
+                        <option value="0.05">5% (Conservative)</option>
+                        <option value="0.10" selected>10% (Realistic)</option>
+                        <option value="0.15">15% (Aggressive)</option>
+                        <option value="0.20">20% (Best case)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="orderGrowth">New Order Growth Rate</label>
+                    <select id="orderGrowth">
+                        <option value="0.02">2% (Minimal)</option>
+                        <option value="0.05" selected>5% (Standard)</option>
+                        <option value="0.10">10% (Active)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB: DELIVERY ROI -->
+    <div class="tab-panel" id="panel-delivery">
+        <div class="section">
+            <div class="section-header">Delivery Cost Comparison</div>
+            <table class="comp-table">
+                <thead>
+                    <tr>
+                        <th>Solution</th>
+                        <th>Monthly Fee</th>
+                        <th>Per Delivery</th>
+                        <th>Commission</th>
+                        <th>Your Monthly Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="row-loss">
+                        <td>DoorDash / Uber Eats</td>
+                        <td>$0</td>
+                        <td>$0</td>
+                        <td id="commissionDisplay">30%</td>
+                        <td class="cost-bad" id="thirdPartyCost">$4,830</td>
+                    </tr>
+                    <tr>
+                        <td>Toast Delivery (DoorDash)</td>
+                        <td>$0</td>
+                        <td>$7.49</td>
+                        <td>0%</td>
+                        <td class="cost-bad" id="toastCostDD">$1,124</td>
+                    </tr>
+                    <tr>
+                        <td>Toast Delivery (Uber)</td>
+                        <td>$0</td>
+                        <td>$6.99</td>
+                        <td>0%</td>
+                        <td style="color: var(--slate-600);" id="toastCostUber">$1,049</td>
+                    </tr>
+                    <tr class="row-win">
+                        <td>Shipday</td>
+                        <td>From $99</td>
+                        <td>$6.49</td>
+                        <td>0%</td>
+                        <td class="cost-good" id="shipdayCost">$1,073</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="breakeven">
+            <h3>Break-Even Analysis</h3>
+            <div class="big">Convert just <span id="breakEvenOrders">14</span> orders to break even</div>
+            <div class="detail">That is only <span id="breakEvenPct">4%</span> of your current third-party volume</div>
+            <div class="progress-track">
+                <div class="progress-fill" id="breakEvenProgress" style="width: 4%;"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">Customer Impact and Review Growth</div>
+            <div class="review-grid">
+                <div class="review-card savings">
+                    <h4 style="color: var(--red-500);">Your Customers Overpay</h4>
+                    <div class="big-val" style="color: var(--red-500);" id="customerOverpay">$7.80</div>
+                    <div class="info">per order on third-party apps vs. ordering direct</div>
+                </div>
+                <div class="review-card growth">
+                    <h4 style="color: var(--green-700);">Google Review Growth</h4>
+                    <div class="big-val" style="color: var(--green-700);">
+                        <span id="ratingFrom">4.2</span> to <span id="ratingTo">4.5</span>
+                    </div>
+                    <div class="info"><span id="newReviews">33</span> new 5-star reviews/month | <span id="monthsToRating">3.2</span> months to target</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">Growth Projections</div>
+            <div class="timeline-grid">
+                <div class="timeline-card">
+                    <div class="period">Month 1-2</div>
+                    <div class="desc">Immediate delivery savings</div>
+                    <div class="amount" id="month1Benefit">$150</div>
+                </div>
+                <div class="timeline-card">
+                    <div class="period">Month 3-6</div>
+                    <div class="desc">Conversion ramp + growth</div>
+                    <div class="amount" id="month3Benefit">$485</div>
+                </div>
+                <div class="timeline-card">
+                    <div class="period">Month 6+</div>
+                    <div class="desc">Full potential realized</div>
+                    <div class="amount" id="month6Benefit">$870</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB: AI RECEPTIONIST -->
+    <div class="tab-panel" id="panel-ai">
+        <div class="ai-section">
+            <div class="ai-badge">Included in Business Advanced Unlimited</div>
+            <h2>AI Receptionist: A 24/7 Employee for Less Than $12/Day</h2>
+            <div class="subtitle">Every unanswered call is a lost customer. Shipday's AI answers them all, knows your customers by name, and only calls you when someone wants to buy.</div>
+
+            <div class="ai-inputs">
+                <div>
+                    <label for="monthlyCalls">Monthly Phone Calls</label>
+                    <input type="number" id="monthlyCalls" value="500" min="50" step="50">
+                </div>
+                <div>
+                    <label for="missRate">Current Missed Call Rate</label>
+                    <select id="missRate">
+                        <option value="0.20">20% (Decent coverage)</option>
+                        <option value="0.30">30% (Average)</option>
+                        <option value="0.35" selected>35% (Typical restaurant)</option>
+                        <option value="0.43">43% (Industry average)</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="callConversion">Phone Order Conversion Rate</label>
+                    <select id="callConversion">
+                        <option value="0.20">20% (Conservative)</option>
+                        <option value="0.25" selected>25% (Average)</option>
+                        <option value="0.30">30% (Strong)</option>
+                        <option value="0.35">35% (High intent callers)</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="staffWage">Average Staff Hourly Wage ($)</label>
+                    <input type="number" id="staffWage" value="18" min="10" step="1">
+                </div>
+            </div>
+
+            <div class="ai-metrics-grid">
+                <div class="ai-metric-card">
+                    <div class="val" id="aiMissedRevenue">$3,063</div>
+                    <div class="lbl">Revenue Loss Avoided / Month</div>
+                </div>
+                <div class="ai-metric-card">
+                    <div class="val" id="aiTimeSaved">$1,200</div>
+                    <div class="lbl">Staff Labor Saved / Month</div>
+                </div>
+                <div class="ai-metric-card">
+                    <div class="val" id="aiCapturedOrders">88</div>
+                    <div class="lbl">Orders Captured From Calls</div>
+                </div>
+                <div class="ai-metric-card">
+                    <div class="val" id="aiROIMultiplier">12x</div>
+                    <div class="lbl">ROI on the $349 Plan</div>
+                </div>
+            </div>
+
+            <div style="background: rgba(106,228,163,0.08); border: 1px solid rgba(106,228,163,0.2); border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 20px;">
+                <div style="font-size: 0.82em; color: var(--green-200); margin-bottom: 4px;">AI Receptionist alone is worth</div>
+                <div style="font-family: 'Fraunces', serif; font-size: 2em; font-weight: 700; color: var(--green-300);" id="aiTotalValue">$4,263</div>
+                <div style="font-size: 0.85em; color: var(--slate-400);">per month in recovered revenue + labor savings</div>
+            </div>
+
+            <div class="ai-compare-box">
+                <div class="ai-compare-item standalone">
+                    <div style="font-size: 0.8em; color: var(--slate-400); margin-bottom: 4px;">Standalone AI Phone Tools</div>
+                    <div class="price">$300-$500/mo</div>
+                    <div class="detail">Phone only. No delivery data. No customer awareness.</div>
+                </div>
+                <div class="ai-compare-vs">vs</div>
+                <div class="ai-compare-item bundled">
+                    <div style="font-size: 0.8em; color: var(--green-300); margin-bottom: 4px;">Shipday Business Advanced Unlimited</div>
+                    <div class="price">$349/mo</div>
+                    <div class="detail">AI Receptionist + Unlimited Deliveries + SMS Marketing + everything else</div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 24px; padding: 16px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                <div style="font-size: 0.88em; color: var(--green-300); font-weight: 600;">Break-Even: Just <span id="aiBreakeven">10</span> captured calls per month covers the entire plan upgrade</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">What Makes Shipday's AI Different</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                <div style="padding: 20px; background: var(--green-50); border-radius: 12px; border: 1px solid var(--green-200);">
+                    <div style="font-weight: 700; color: var(--green-800); margin-bottom: 8px;">Customer-Aware, Not Script-Based</div>
+                    <div style="font-size: 0.88em; color: var(--slate-600);">Connected to your live orders and customer profiles. Knows who is calling, their order history, and current delivery status.</div>
+                </div>
+                <div style="padding: 20px; background: var(--green-50); border-radius: 12px; border: 1px solid var(--green-200);">
+                    <div style="font-weight: 700; color: var(--green-800); margin-bottom: 8px;">You Only Answer Sales Calls</div>
+                    <div style="font-size: 0.88em; color: var(--slate-600);">AI handles "where's my order?", sends tracking links, routes online orders, and only emails you for real sales opportunities like catering.</div>
+                </div>
+                <div style="padding: 20px; background: var(--green-50); border-radius: 12px; border: 1px solid var(--green-200);">
+                    <div style="font-weight: 700; color: var(--green-800); margin-bottom: 8px;">10 Minute Setup, 24/7 Coverage</div>
+                    <div style="font-size: 0.88em; color: var(--slate-600);">Configured during your onboarding call. Works nights, weekends, and holidays. Captures every call your staff would have missed.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB: PLAN COMPARISON -->
+    <div class="tab-panel" id="panel-plans">
+        <div class="section" style="border: none; background: transparent; padding: 0;">
+            <div class="section-header">Which Plan Fits Your Growth?</div>
+            <div class="plan-grid">
+                <!-- ELITE -->
+                <div class="plan-card">
+                    <div class="plan-name">Elite</div>
+                    <div class="plan-price">$99<span>/month</span></div>
+                    <div class="plan-daily">$3.30/day</div>
+                    <ul class="plan-features">
+                        <li><span class="check">+</span> Unlimited third-party dispatch</li>
+                        <li><span class="check">+</span> 300 takeout orders ($0.20 over)</li>
+                        <li><span class="check">+</span> 5-star Google Review Boost</li>
+                        <li><span class="check">+</span> Live branded tracking</li>
+                        <li><span class="check">+</span> AI Review Responder</li>
+                        <li><span class="check">+</span> Marketing banner</li>
+                        <li><span class="x">-</span> <span style="color: var(--slate-400);">SMS Marketing</span></li>
+                        <li><span class="x">-</span> <span style="color: var(--slate-400);">VIP Customer Profiles</span></li>
+                        <li><span class="x">-</span> <span style="color: var(--slate-400);">Guaranteed Refunds</span></li>
+                        <li><span class="x">-</span> <span style="color: var(--slate-400);">Dedicated CSM</span></li>
+                        <li><span class="x">-</span> <span style="color: var(--slate-400);">Delivery Issue Alerts</span></li>
+                        <li><span class="x">-</span> <span style="color: var(--slate-400);">AI Receptionist</span></li>
+                    </ul>
+                    <div class="plan-roi">
+                        <div class="roi-val" id="eliteROI">287%</div>
+                        <div class="roi-label">Estimated Annual ROI</div>
+                    </div>
+                </div>
+
+                <!-- BUSINESS AI LITE -->
+                <div class="plan-card">
+                    <div class="plan-name">Business AI Lite</div>
+                    <div class="plan-price">$159<span>/month</span></div>
+                    <div class="plan-daily">$5.30/day</div>
+                    <ul class="plan-features">
+                        <li><span class="check">+</span> Unlimited third-party dispatch</li>
+                        <li><span class="check">+</span> Unlimited takeout orders</li>
+                        <li><span class="check">+</span> 5-star Google Review Boost</li>
+                        <li><span class="check">+</span> Live branded tracking</li>
+                        <li><span class="check">+</span> AI Review Responder</li>
+                        <li><span class="check">+</span> Marketing banner</li>
+                        <li><span class="check">+</span> SMS Marketing (1,500/mo)</li>
+                        <li><span class="check">+</span> VIP Customer Profiles</li>
+                        <li><span class="check">+</span> Guaranteed Refunds</li>
+                        <li><span class="check">+</span> Dedicated CSM</li>
+                        <li><span class="check">+</span> Delivery Issue Alerts</li>
+                        <li><span class="x">-</span> <span style="color: var(--slate-400);">AI Receptionist</span></li>
+                    </ul>
+                    <div class="plan-roi">
+                        <div class="roi-val" id="liteROI">485%</div>
+                        <div class="roi-label">Estimated Annual ROI</div>
+                    </div>
+                </div>
+
+                <!-- BUSINESS ADVANCED UNLIMITED -->
+                <div class="plan-card recommended">
+                    <div class="plan-name">Business Advanced Unlimited</div>
+                    <div class="plan-price">$349<span>/month</span></div>
+                    <div class="plan-daily">$11.63/day -- your 24/7 AI employee</div>
+                    <ul class="plan-features">
+                        <li><span class="check">+</span> Unlimited third-party dispatch</li>
+                        <li><span class="check">+</span> Unlimited takeout + deliveries</li>
+                        <li><span class="check">+</span> 5-star Google Review Boost</li>
+                        <li><span class="check">+</span> Live branded tracking</li>
+                        <li><span class="check">+</span> AI Review Responder</li>
+                        <li><span class="check">+</span> Marketing banner</li>
+                        <li><span class="check">+</span> SMS Marketing (3,000/mo)</li>
+                        <li><span class="check">+</span> VIP Customer Profiles</li>
+                        <li><span class="check">+</span> Guaranteed Refunds</li>
+                        <li><span class="check">+</span> Dedicated CSM</li>
+                        <li><span class="check">+</span> Delivery Issue Alerts</li>
+                        <li><span class="gold-check">*</span> <strong style="color: var(--gold);">AI Receptionist (24/7)</strong></li>
+                    </ul>
+                    <div class="plan-roi">
+                        <div class="roi-val" id="unlimitedROI">1,240%</div>
+                        <div class="roi-label">Estimated Annual ROI (with AI)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">Annual Value Breakdown by Plan</div>
+            <table class="comp-table">
+                <thead>
+                    <tr>
+                        <th>Value Stream</th>
+                        <th>Elite ($99)</th>
+                        <th>Business AI Lite ($159)</th>
+                        <th>Advanced Unlimited ($349)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align: left; font-weight: 600;">Delivery Savings</td>
+                        <td id="planDeliveryElite">$1,800</td>
+                        <td id="planDeliveryLite">$1,800</td>
+                        <td id="planDeliveryUnlimited">$1,800</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; font-weight: 600;">Conversion + Growth Revenue</td>
+                        <td id="planGrowthElite">$6,348</td>
+                        <td id="planGrowthLite">$6,348</td>
+                        <td id="planGrowthUnlimited">$6,348</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; font-weight: 600;">SMS Marketing Revenue</td>
+                        <td style="color: var(--slate-400);">Not included</td>
+                        <td id="planSMSLite">$3,600</td>
+                        <td id="planSMSUnlimited">$7,200</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; font-weight: 600;">AI Receptionist Value</td>
+                        <td style="color: var(--slate-400);">Not included</td>
+                        <td style="color: var(--slate-400);">Not included</td>
+                        <td class="cost-good" id="planAIUnlimited">$51,156</td>
+                    </tr>
+                    <tr style="background: var(--green-50); font-weight: 700;">
+                        <td style="text-align: left;">Annual Investment</td>
+                        <td>$1,188</td>
+                        <td>$1,908</td>
+                        <td>$4,188</td>
+                    </tr>
+                    <tr style="background: var(--green-100); font-weight: 700;">
+                        <td style="text-align: left; color: var(--green-800);">Net Annual Value</td>
+                        <td class="cost-good" id="planNetElite">$6,960</td>
+                        <td class="cost-good" id="planNetLite">$9,840</td>
+                        <td style="color: var(--green-700); font-size: 1.1em;" id="planNetUnlimited">$62,316</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-section">
+        <h2>Stop Losing <span class="green" id="ctaLosing">$2,867</span> Every Month</h2>
+        <div style="font-size: 1.05em; color: var(--green-200); margin-bottom: 8px;">
+            Business Advanced Unlimited pays for itself in <strong id="ctaPayback">3.7</strong> days
+        </div>
+        <div class="cta-stats">
+            <div class="cta-stat">
+                <div class="val">$349/mo</div>
+                <div class="lbl">Total Investment</div>
+            </div>
+            <div class="cta-stat">
+                <div class="val" id="ctaMonthly">$2,867</div>
+                <div class="lbl">Monthly Return</div>
+            </div>
+            <div class="cta-stat">
+                <div class="val" id="ctaAnnual">$34,404</div>
+                <div class="lbl">Annual Impact</div>
+            </div>
+            <div class="cta-stat">
+                <div class="val">$0</div>
+                <div class="lbl">Risk (No contracts)</div>
+            </div>
+        </div>
+        <div class="cta-bottom">
+            45-minute onboarding. Live the same week. AI Receptionist setup in 10 minutes.
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // ---- STATE ----
+    let inputs = {
+        orderValue: 35,
+        monthlyDeliveries: 400,
+        monthlyInHouseDeliveries: 150,
+        monthlyTakeout: 500,
+        commissionRate: 0.30,
+        menuMarkup: 0.15,
+        currentRating: 4.2,
+        totalGoogleReviews: 85,
+        targetRating: 4.5,
+        toastDeliveryService: 'doordash',
+        conversionRate: 0.10,
+        orderGrowth: 0.05,
+        // AI Receptionist inputs
+        monthlyCalls: 500,
+        missRate: 0.35,
+        callConversion: 0.25,
+        staffWage: 18,
+    };
+
+    // ---- CONSTANTS ----
+    const SHIPDAY_FEE = 6.49;
+    const TOAST_DD = 7.49;
+    const TOAST_UBER = 6.99;
+    const REVIEW_RATE = 0.05;
+    const PLAN_ELITE = 99;
+    const PLAN_LITE = 159;
+    const PLAN_UNLIMITED = 349;
+    const SMS_REVENUE_PER_MSG = 0.20; // conservative estimated revenue per SMS sent
+
+    // ---- HELPERS ----
+    function fmt(n) {
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(n);
+    }
+    function el(id) { return document.getElementById(id); }
+    function set(id, val) { const e = el(id); if (e) e.textContent = val; }
+
+    // ---- MAIN CALCULATION ----
+    function calculate() {
+        const i = inputs;
+        const markedUp = i.orderValue * (1 + i.menuMarkup);
+        const toastRate = i.toastDeliveryService === 'doordash' ? TOAST_DD : i.toastDeliveryService === 'uber' ? TOAST_UBER : 0;
+
+        // ---- DELIVERY SAVINGS ----
+        const thirdPartyPerOrder = markedUp * i.commissionRate;
+        const monthlyThirdPartyCost = thirdPartyPerOrder * i.monthlyDeliveries;
+        const toastDeliverySavings = Math.max(0, i.monthlyInHouseDeliveries * (toastRate - SHIPDAY_FEE));
+
+        // Conversion savings
+        const savingsPerConverted = thirdPartyPerOrder - SHIPDAY_FEE;
+        const convertedOrders = i.monthlyDeliveries * i.conversionRate;
+        const conversionSavings = convertedOrders * savingsPerConverted;
+
+        // Growth revenue
+        const totalDeliveries = i.monthlyDeliveries + i.monthlyInHouseDeliveries;
+        const newOrders = totalDeliveries * i.orderGrowth;
+        const growthRevenue = newOrders * (i.orderValue - SHIPDAY_FEE);
+
+        // Full delivery benefit (month 6+)
+        const fullDeliveryBenefit = toastDeliverySavings + conversionSavings + growthRevenue;
+
+        // Timeline
+        const m1 = Math.max(0, toastDeliverySavings);
+        const m3 = toastDeliverySavings + (conversionSavings * 0.4);
+        const m6 = fullDeliveryBenefit;
+
+        // Breakeven
+        const breakEvenOrders = savingsPerConverted > 0 ? Math.ceil(PLAN_ELITE / savingsPerConverted) : 999;
+        const breakEvenPct = i.monthlyDeliveries > 0 ? ((breakEvenOrders / i.monthlyDeliveries) * 100).toFixed(0) : 0;
+
+        // Customer overpay
+        const serviceFee = markedUp * 0.05;
+        const customerOverpay = (markedUp - i.orderValue) + serviceFee;
+
+        // Google reviews
+        const totalTrackingOrders = i.monthlyInHouseDeliveries + i.monthlyTakeout;
+        const newReviewsMonthly = totalTrackingOrders * REVIEW_RATE;
+        let reviewsNeeded = 0, monthsToTarget = 0;
+        if (i.targetRating > i.currentRating) {
+            let tr = i.totalGoogleReviews, ts = i.currentRating * tr, cr = i.currentRating;
+            while (cr < i.targetRating && monthsToTarget < 60) {
+                monthsToTarget++;
+                const nr = Math.round(newReviewsMonthly);
+                tr += nr; ts += 5 * nr; cr = ts / tr;
+                reviewsNeeded += nr;
+                if (cr >= i.targetRating) break;
+            }
+        }
+
+        // ---- AI RECEPTIONIST ----
+        const missedCalls = i.monthlyCalls * i.missRate;
+        const recoveredRevenue = missedCalls * i.callConversion * i.orderValue;
+        const aiHandledCalls = i.monthlyCalls * 0.80;
+        const timeSavedHours = (aiHandledCalls * 5) / 60; // 5 min per call
+        const laborSaved = timeSavedHours * i.staffWage;
+        const capturedOrders = Math.round(missedCalls * i.callConversion);
+        const aiTotalValue = recoveredRevenue + laborSaved;
+        const aiROI = Math.round((aiTotalValue / PLAN_UNLIMITED));
+        const aiBreakeven = i.orderValue > 0 ? Math.ceil(PLAN_UNLIMITED / i.orderValue) : 99;
+
+        // ---- PLAN ROIs ----
+        const deliveryAnnual = fullDeliveryBenefit * 12;
+        const smsLiteAnnual = 1500 * SMS_REVENUE_PER_MSG * 12;
+        const smsUnlimitedAnnual = 3000 * SMS_REVENUE_PER_MSG * 12;
+        const aiAnnual = aiTotalValue * 12;
+
+        const eliteAnnualValue = deliveryAnnual;
+        const liteAnnualValue = deliveryAnnual + smsLiteAnnual;
+        const unlimitedAnnualValue = deliveryAnnual + smsUnlimitedAnnual + aiAnnual;
+
+        const eliteROI = Math.round(((eliteAnnualValue - PLAN_ELITE * 12) / (PLAN_ELITE * 12)) * 100);
+        const liteROI = Math.round(((liteAnnualValue - PLAN_LITE * 12) / (PLAN_LITE * 12)) * 100);
+        const unlimitedROI = Math.round(((unlimitedAnnualValue - PLAN_UNLIMITED * 12) / (PLAN_UNLIMITED * 12)) * 100);
+
+        // Total with AI (what the hero shows for Business Advanced Unlimited)
+        const totalMonthlyWithAI = fullDeliveryBenefit + (3000 * SMS_REVENUE_PER_MSG) + aiTotalValue;
+        const totalAnnualWithAI = totalMonthlyWithAI * 12;
+        const paybackDays = totalMonthlyWithAI > 0 ? (PLAN_UNLIMITED / (totalMonthlyWithAI / 30)).toFixed(1) : 'N/A';
+
+        // ---- UPDATE UI ----
+
+        // Hero
+        set('heroDeliverySavings', fmt(toastDeliverySavings + conversionSavings));
+        set('heroRevenueGrowth', fmt(growthRevenue + (3000 * SMS_REVENUE_PER_MSG)));
+        set('heroAIRecovery', fmt(aiTotalValue));
+        set('heroTotal', fmt(totalMonthlyWithAI));
+        set('heroAnnual', fmt(totalAnnualWithAI));
+
+        // Delivery tab
+        set('commissionDisplay', (i.commissionRate * 100).toFixed(0) + '%');
+        set('thirdPartyCost', fmt(monthlyThirdPartyCost));
+        set('toastCostDD', fmt(TOAST_DD * i.monthlyInHouseDeliveries));
+        set('toastCostUber', fmt(TOAST_UBER * i.monthlyInHouseDeliveries));
+        const shipdayDirectCost = PLAN_ELITE + (SHIPDAY_FEE * i.monthlyInHouseDeliveries);
+        set('shipdayCost', fmt(shipdayDirectCost));
+
+        set('breakEvenOrders', breakEvenOrders);
+        set('breakEvenPct', breakEvenPct + '%');
+        const prog = el('breakEvenProgress');
+        if (prog) prog.style.width = Math.min(100, parseInt(breakEvenPct)) + '%';
+
+        set('customerOverpay', fmt(customerOverpay));
+        set('ratingFrom', i.currentRating);
+        set('ratingTo', i.targetRating);
+        set('newReviews', Math.round(newReviewsMonthly));
+        set('monthsToRating', monthsToTarget > 0 ? monthsToTarget.toFixed(1) : '0');
+
+        set('month1Benefit', fmt(m1));
+        set('month3Benefit', fmt(m3));
+        set('month6Benefit', fmt(m6));
+
+        // AI tab
+        set('aiMissedRevenue', fmt(recoveredRevenue));
+        set('aiTimeSaved', fmt(laborSaved));
+        set('aiCapturedOrders', capturedOrders);
+        set('aiROIMultiplier', aiROI + 'x');
+        set('aiTotalValue', fmt(aiTotalValue));
+        set('aiBreakeven', aiBreakeven);
+
+        // Plans tab
+        set('eliteROI', eliteROI.toLocaleString() + '%');
+        set('liteROI', liteROI.toLocaleString() + '%');
+        set('unlimitedROI', unlimitedROI.toLocaleString() + '%');
+
+        set('planDeliveryElite', fmt(deliveryAnnual));
+        set('planDeliveryLite', fmt(deliveryAnnual));
+        set('planDeliveryUnlimited', fmt(deliveryAnnual));
+        set('planGrowthElite', fmt(deliveryAnnual)); // simplified
+        set('planGrowthLite', fmt(deliveryAnnual));
+        set('planGrowthUnlimited', fmt(deliveryAnnual));
+        set('planSMSLite', fmt(smsLiteAnnual));
+        set('planSMSUnlimited', fmt(smsUnlimitedAnnual));
+        set('planAIUnlimited', fmt(aiAnnual));
+
+        const eliteNet = eliteAnnualValue - (PLAN_ELITE * 12);
+        const liteNet = liteAnnualValue - (PLAN_LITE * 12);
+        const unlimitedNet = unlimitedAnnualValue - (PLAN_UNLIMITED * 12);
+        set('planNetElite', fmt(eliteNet));
+        set('planNetLite', fmt(liteNet));
+        set('planNetUnlimited', fmt(unlimitedNet));
+
+        // CTA
+        set('ctaLosing', fmt(totalMonthlyWithAI));
+        set('ctaMonthly', fmt(totalMonthlyWithAI));
+        set('ctaAnnual', fmt(totalAnnualWithAI));
+        set('ctaPayback', paybackDays);
+    }
+
+    // ---- TAB SWITCHING ----
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            tab.classList.add('active');
+            el('panel-' + tab.dataset.tab).classList.add('active');
+        });
+    });
+
+    // ---- EVENT LISTENERS ----
+    function setupListeners() {
+        const fields = [
+            'orderValue', 'monthlyDeliveries', 'monthlyInHouseDeliveries', 'monthlyTakeout',
+            'commissionRate', 'menuMarkup', 'currentRating', 'totalGoogleReviews', 'targetRating',
+            'toastDeliveryService', 'conversionRate', 'orderGrowth',
+            'monthlyCalls', 'missRate', 'callConversion', 'staffWage'
+        ];
+        fields.forEach(key => {
+            const e = el(key);
+            if (!e) return;
+            const handler = () => {
+                const v = e.value;
+                if (key === 'toastDeliveryService') {
+                    inputs[key] = v;
+                } else {
+                    inputs[key] = parseFloat(v) || 0;
+                }
+                calculate();
+            };
+            e.addEventListener('input', handler);
+            e.addEventListener('change', handler);
+        });
+    }
+
+    // ---- INIT ----
+    document.addEventListener('DOMContentLoaded', () => {
+        Object.keys(inputs).forEach(key => {
+            const e = el(key);
+            if (e) e.value = inputs[key];
+        });
+        setupListeners();
+        calculate();
+    });
+</script>
+</body>
+</html>
